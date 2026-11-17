@@ -17,85 +17,198 @@
     .font-heading {
       font-family: 'Rajdhani', sans-serif;
     }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0c10;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ef4444;
+    }
   </style>
 </head>
-<body class="min-h-screen pb-16 selection:bg-red-600 selection:text-white">
+<body class="min-h-screen flex flex-col selection:bg-red-600 selection:text-white">
 
-  <!-- Cabeçalho -->
-  <header class="border-b border-red-950/40 bg-[#0d0f17]/80 backdrop-blur-md sticky top-0 z-30">
-    <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+  <!-- Cabeçalho Superior Fixo -->
+  <header class="border-b border-red-950/40 bg-[#0d0f17]/95 backdrop-blur-md sticky top-0 z-40 h-16">
+    <div class="max-w-[1440px] mx-auto h-full px-4 sm:px-6 flex items-center justify-between gap-4">
+      
+      <!-- Esquerda: Botão Mobile + Logo -->
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500 font-bold text-xl shadow-[0_0_15px_rgba(239,68,68,0.3)]">
-          RL
-        </div>
-        <div>
-          <h1 class="text-2xl font-bold font-heading tracking-wider text-white">REDLINE <span class="text-red-500">MECÂNICA</span></h1>
-          <p class="text-xs text-zinc-400">Manual Oficial de Regras e Conduta</p>
+        <button 
+          id="mobileMenuBtn"
+          onclick="toggleMobileSidebar()"
+          class="lg:hidden p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-red-500/40 transition-colors"
+          aria-label="Abrir menu"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+
+        <a href="#" onclick="resetAll(); return false;" class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500 font-bold text-lg shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+            RL
+          </div>
+          <div>
+            <h1 class="text-xl font-bold font-heading tracking-wider text-white leading-none">
+              REDLINE <span class="text-red-500">MECÂNICA</span>
+            </h1>
+            <p class="text-[11px] text-zinc-400 mt-0.5">Manual Oficial de Regras</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Centro: Barra de Busca Estilo GitBook -->
+      <div class="flex-1 max-w-md mx-2">
+        <div class="relative">
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Buscar regra, número, palavra-chave..." 
+            autocomplete="off"
+            class="w-full bg-zinc-900/95 border border-zinc-800 rounded-lg pl-9 pr-9 py-2 text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all"
+          >
+          <svg class="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <button 
+            id="clearSearchBtn"
+            onclick="clearSearchOnly()"
+            title="Limpar busca"
+            class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-red-400 p-0.5"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
         </div>
       </div>
-      <div class="text-right">
+
+      <!-- Direita: Status -->
+      <div class="hidden sm:flex items-center">
         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          Manual Atualizado
+          Atualizado
         </span>
       </div>
     </div>
   </header>
 
-  <main class="max-w-5xl mx-auto px-4 pt-8">
+  <!-- Overlay Mobile -->
+  <div 
+    id="sidebarOverlay" 
+    onclick="toggleMobileSidebar()"
+    class="fixed inset-0 bg-black/70 backdrop-blur-xs z-30 hidden lg:hidden"
+  ></div>
 
-    <!-- Introdução -->
-    <div class="bg-gradient-to-r from-red-950/30 via-zinc-900/60 to-zinc-900/40 border border-red-500/20 rounded-2xl p-6 sm:p-8 mb-8 shadow-xl">
-      <h2 class="text-2xl sm:text-3xl font-bold font-heading text-white mb-2">Respeito, organização e profissionalismo.</h2>
-      <p class="text-zinc-400 text-sm sm:text-base leading-relaxed">
-        Estas regras são obrigatórias para todos os integrantes, independentemente do cargo. O cumprimento garante um ambiente justo, eficiente e respeitado na cidade.
-      </p>
-    </div>
+  <!-- Layout Principal Estilo GitBook -->
+  <div class="max-w-[1440px] w-full mx-auto flex-1 flex">
 
-    <!-- Controles de Busca e Filtro -->
-    <div class="space-y-4 mb-8">
-      <div class="relative">
-        <input 
-          type="text" 
-          id="searchInput" 
-          placeholder="Pesquisar regra, penalidade, palavra-chave..." 
-          class="w-full bg-zinc-900/90 border border-zinc-800 rounded-xl px-5 py-3.5 pl-12 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all shadow-inner"
-        >
-        <svg class="w-5 h-5 text-zinc-500 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-        </svg>
+    <!-- Painel Lateral de Seleção (Sidebar) -->
+    <aside 
+      id="sidebar"
+      class="fixed lg:sticky top-16 left-0 z-30 w-72 h-[calc(100vh-4rem)] bg-[#0d0f17] lg:bg-[#0b0c10] border-r border-zinc-800/80 overflow-y-auto p-4 transition-transform duration-200 -translate-x-full lg:translate-x-0 shrink-0"
+    >
+      <div class="px-3 mb-2 text-[11px] font-bold uppercase tracking-wider text-zinc-500">
+        Navegação do Manual
+      </div>
+      <nav id="sidebarNav" class="space-y-1">
+        <!-- Categorias injetadas via JS -->
+      </nav>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-1 min-w-0 px-4 sm:px-8 lg:px-12 py-8 max-w-4xl">
+
+      <!-- Banner Introdutório -->
+      <div id="introBanner" class="bg-gradient-to-r from-red-950/30 via-zinc-900/60 to-zinc-900/40 border border-red-500/20 rounded-2xl p-6 mb-5 shadow-xl">
+        <div class="flex items-center gap-2 text-xs font-semibold text-red-400 uppercase tracking-wider mb-1">
+          <span>Documentação Interna</span>
+          <span>•</span>
+          <span>RedLine</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold font-heading text-white mb-2">
+          Respeito, organização e profissionalismo.
+        </h2>
+        <p class="text-zinc-400 text-sm leading-relaxed">
+          Estas regras são obrigatórias para todos os integrantes, independentemente do cargo. Use o menu lateral para navegar por seção ou utilize a barra superior para buscar qualquer termo diretamente.
+        </p>
       </div>
 
-      <!-- Filtro por Categorias -->
-      <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" id="categoriesContainer">
+      <!-- Aviso Fixo no Topo: Rádio & Ponto (sempre visível) -->
+      <div class="sticky top-16 z-20 mb-6 bg-[#130b0e]/95 backdrop-blur-md border border-red-500/35 rounded-xl px-4 py-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.65)] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-400 shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+            </svg>
+          </div>
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-red-400 block leading-tight">
+              Rádio &amp; Ponto • Obrigatório em Serviço
+            </span>
+            <p class="text-xs sm:text-sm text-zinc-200 mt-0.5">
+              Rádio oficial: <strong class="text-white bg-red-500/20 border border-red-500/30 px-1.5 py-0.5 rounded">17</strong> &nbsp;•&nbsp; Sempre conecte na call <strong class="text-white">Bater-Ponto</strong> ao iniciar.
+            </p>
+          </div>
+        </div>
+        <span class="text-[11px] font-semibold text-red-400/90 bg-red-950/60 border border-red-800/40 px-2.5 py-1 rounded-md self-start sm:self-center shrink-0">
+          REGRA 09
+        </span>
+      </div>
+
+      <!-- Cabeçalho da Seção / Resultados da Busca -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b border-zinc-800/80">
+        <div>
+          <h3 id="currentSectionTitle" class="text-xl sm:text-2xl font-bold font-heading text-white tracking-wide">
+            Todas as Regras
+          </h3>
+          <p id="currentSectionSubtitle" class="text-xs text-zinc-500 mt-0.5">
+            Exibindo <strong id="itemsCount" class="text-red-400">0</strong> regras cadastradas
+          </p>
+        </div>
+
+        <button 
+          id="resetFilterBtn"
+          onclick="resetAll()"
+          class="hidden px-3 py-1.5 text-xs font-medium rounded-lg bg-zinc-900 text-zinc-300 border border-zinc-800 hover:border-red-500/40 hover:text-red-400 transition-colors"
+        >
+          Ver todas as seções
+        </button>
+      </div>
+
+      <!-- Lista de Regras (Formato Documentação / GitBook) -->
+      <div id="rulesContainer" class="space-y-4">
         <!-- Injetado via JS -->
       </div>
 
-      <!-- Contador de Regras Exibidas -->
-      <div class="flex items-center justify-between text-xs text-zinc-500 px-1">
-        <span>Exibindo: <strong id="itemsCount" class="text-red-400 font-semibold">0</strong> itens</span>
-        <button id="clearBtn" class="hover:text-red-400 underline hidden">Limpar filtros</button>
+      <!-- Mensagem de Nenhum Resultado -->
+      <div id="noResults" class="hidden text-center py-16 bg-zinc-900/30 border border-zinc-800/80 rounded-2xl">
+        <p class="text-zinc-300 text-base font-medium">Nenhuma regra encontrada para "<span id="searchTermDisplay" class="text-red-400"></span>"</p>
+        <p class="text-zinc-500 text-xs mt-1">Tente buscar por outro termo ou número de regra (ex: 42, baú, meta, adv).</p>
+        <button 
+          onclick="resetAll()" 
+          class="mt-4 px-4 py-2 text-xs font-semibold bg-red-600/20 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-600/30 transition-all"
+        >
+          Limpar busca e mostrar tudo
+        </button>
       </div>
-    </div>
 
-    <!-- Lista de Regras (Grid) -->
-    <div id="rulesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <!-- Regras injetadas pelo JavaScript -->
-    </div>
+      <!-- Rodapé -->
+      <footer class="mt-16 pt-6 border-t border-zinc-900 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-zinc-600">
+        <p>RedLine Mecânica • Manual Oficial de Conduta</p>
+        <p>Todos os direitos reservados</p>
+      </footer>
 
-    <!-- Mensagem de Nenhuma Regra Encontrada -->
-    <div id="noResults" class="hidden text-center py-16 bg-zinc-900/30 border border-zinc-800/80 rounded-2xl">
-      <p class="text-zinc-400 text-base">Nenhuma regra encontrada com esse termo de busca.</p>
-      <button onclick="resetFilters()" class="mt-3 px-4 py-1.5 text-xs font-semibold bg-red-600/20 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-600/30 transition-all">
-        Limpar pesquisa
-      </button>
-    </div>
-
-  </main>
-
-  <footer class="max-w-5xl mx-auto px-4 mt-16 pt-8 border-t border-zinc-900 text-center text-xs text-zinc-600">
-    <p>RedLine Mecânica • Todos os direitos reservados • Seja bem-vindo(a) à equipe</p>
-  </footer>
+    </main>
+  </div>
 
   <script>
     const rules = [
@@ -142,89 +255,184 @@
     let activeCategory = "Todas";
     let searchQuery = "";
 
-    function initCategories() {
+    function normalizeText(str) {
+      return str
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function highlightText(text, query) {
+      if (!query) return text;
+      const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(${escaped})`, 'gi');
+      return text.replace(regex, '<mark class="bg-red-500/30 text-red-200 px-1 rounded">$1</mark>');
+    }
+
+    function renderSidebar() {
       const categories = ["Todas", ...new Set(rules.map(r => r.category))];
-      const container = document.getElementById("categoriesContainer");
-      container.innerHTML = categories.map(cat => `
-        <button 
-          onclick="setCategory('${cat}')"
-          class="category-btn whitespace-nowrap px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-all ${cat === activeCategory ? 'bg-red-600 text-white border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.4)]' : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-700'}"
-        >
-          ${cat}
-        </button>
+      const nav = document.getElementById("sidebarNav");
+
+      nav.innerHTML = categories.map(cat => {
+        const count = cat === "Todas"
+          ? rules.length
+          : rules.filter(r => r.category === cat).length;
+
+        const isActive = activeCategory === cat && searchQuery === "";
+
+        return `
+          <button
+            onclick="selectCategory('${cat}')"
+            class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left text-xs sm:text-sm font-medium transition-all ${
+              isActive
+                ? 'bg-red-600/15 text-red-400 border-l-2 border-red-500 font-semibold'
+                : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900/70'
+            }"
+          >
+            <span class="truncate pr-2">${cat === "Todas" ? "Visão Geral (Todas)" : cat}</span>
+            <span class="text-[11px] px-2 py-0.5 rounded-md ${
+              isActive
+                ? 'bg-red-500/20 text-red-300'
+                : 'bg-zinc-900 text-zinc-500'
+            }">
+              ${count}
+            </span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectCategory(cat) {
+      activeCategory = cat;
+      searchQuery = "";
+      document.getElementById("searchInput").value = "";
+      document.getElementById("clearSearchBtn").classList.add("hidden");
+      
+      if (window.innerWidth < 1024) {
+        closeMobileSidebar();
+      }
+
+      renderSidebar();
+      renderContent();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderContent() {
+      const normalizedQuery = normalizeText(searchQuery);
+      const isSearching = normalizedQuery.length > 0;
+
+      const filtered = rules.filter(r => {
+        if (isSearching) {
+          const searchable = normalizeText(`${r.id} ${r.category} ${r.title} ${r.desc}`);
+          return searchable.includes(normalizedQuery);
+        }
+        return activeCategory === "Todas" || r.category === activeCategory;
+      });
+
+      const container = document.getElementById("rulesContainer");
+      const noResults = document.getElementById("noResults");
+      const sectionTitle = document.getElementById("currentSectionTitle");
+      const sectionSubtitle = document.getElementById("currentSectionSubtitle");
+      const resetFilterBtn = document.getElementById("resetFilterBtn");
+      const introBanner = document.getElementById("introBanner");
+
+      if (isSearching) {
+        introBanner.classList.add("hidden");
+        sectionTitle.textContent = `Resultados da busca`;
+        sectionSubtitle.innerHTML = `Encontradas <strong class="text-red-400">${filtered.length}</strong> regra(s) para "<span class="text-white">${searchQuery}</span>"`;
+        resetFilterBtn.classList.remove("hidden");
+      } else {
+        introBanner.classList.toggle("hidden", activeCategory !== "Todas");
+        sectionTitle.textContent = activeCategory === "Todas" ? "Todas as Regras" : activeCategory;
+        sectionSubtitle.innerHTML = `Exibindo <strong class="text-red-400">${filtered.length}</strong> ${filtered.length === 1 ? 'regra' : 'regras'}`;
+        resetFilterBtn.classList.toggle("hidden", activeCategory === "Todas");
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = "";
+        noResults.classList.remove("hidden");
+        document.getElementById("searchTermDisplay").textContent = searchQuery;
+        return;
+      }
+
+      noResults.classList.add("hidden");
+
+      container.innerHTML = filtered.map(r => `
+        <article class="bg-[#10121a] border border-zinc-800/80 hover:border-red-500/40 rounded-xl p-5 sm:p-6 transition-all shadow-md">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="text-xs font-bold font-heading px-2.5 py-0.5 rounded bg-red-950/70 text-red-400 border border-red-800/50 tracking-wider">
+                ${highlightText(r.id, searchQuery)}
+              </span>
+              <h4 class="text-base sm:text-lg font-bold text-white">
+                ${highlightText(r.title, searchQuery)}
+              </h4>
+            </div>
+            <span class="text-[11px] font-medium text-zinc-400 bg-zinc-900 px-2.5 py-0.5 rounded-md border border-zinc-800">
+              ${r.category}
+            </span>
+          </div>
+          <p class="text-zinc-300 text-sm leading-relaxed border-l-2 border-zinc-800 pl-3.5">
+            ${highlightText(r.desc, searchQuery)}
+          </p>
+        </article>
       `).join('');
     }
 
-    function setCategory(cat) {
-      activeCategory = cat;
-      initCategories();
-      renderRules();
+    function clearSearchOnly() {
+      searchQuery = "";
+      const input = document.getElementById("searchInput");
+      input.value = "";
+      document.getElementById("clearSearchBtn").classList.add("hidden");
+      renderSidebar();
+      renderContent();
+      input.focus();
     }
 
-    function renderRules() {
-      const filtered = rules.filter(r => {
-        const matchesCat = activeCategory === "Todas" || r.category === activeCategory;
-        const matchesQuery = r.id.toLowerCase().includes(searchQuery) ||
-                             r.title.toLowerCase().includes(searchQuery) ||
-                             r.desc.toLowerCase().includes(searchQuery) ||
-                             r.category.toLowerCase().includes(searchQuery);
-        return matchesCat && matchesQuery;
-      });
-
-      const grid = document.getElementById("rulesGrid");
-      const noRes = document.getElementById("noResults");
-      const itemsCount = document.getElementById("itemsCount");
-      const clearBtn = document.getElementById("clearBtn");
-
-      itemsCount.textContent = filtered.length;
-
-      if (filtered.length === 0) {
-        grid.innerHTML = "";
-        noRes.classList.remove("hidden");
-      } else {
-        noRes.classList.add("hidden");
-        grid.innerHTML = filtered.map(r => `
-          <div class="bg-[#10121a] border border-zinc-800/80 hover:border-red-500/40 rounded-xl p-5 transition-all group flex flex-col justify-between shadow-md">
-            <div>
-              <div class="flex items-center justify-between gap-2 mb-3">
-                <span class="text-xs font-bold font-heading px-2 py-0.5 rounded bg-red-950/60 text-red-400 border border-red-800/40 tracking-wider">
-                  ${r.id}
-                </span>
-                <span class="text-[11px] font-medium text-zinc-500 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
-                  ${r.category}
-                </span>
-              </div>
-              <h3 class="text-base font-bold text-white group-hover:text-red-400 transition-colors mb-2">
-                ${r.title}
-              </h3>
-              <p class="text-zinc-400 text-xs sm:text-sm leading-relaxed">
-                ${r.desc}
-              </p>
-            </div>
-          </div>
-        `).join('');
-      }
-
-      clearBtn.classList.toggle("hidden", activeCategory === "Todas" && searchQuery === "");
-    }
-
-    function resetFilters() {
+    function resetAll() {
       activeCategory = "Todas";
       searchQuery = "";
       document.getElementById("searchInput").value = "";
-      initCategories();
-      renderRules();
+      document.getElementById("clearSearchBtn").classList.add("hidden");
+      renderSidebar();
+      renderContent();
     }
 
-    document.getElementById("searchInput").addEventListener("input", (e) => {
-      searchQuery = e.target.value.toLowerCase().trim();
-      renderRules();
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("sidebarOverlay");
+      const isClosed = sidebar.classList.contains("-translate-x-full");
+
+      if (isClosed) {
+        sidebar.classList.remove("-translate-x-full");
+        overlay.classList.remove("hidden");
+      } else {
+        closeMobileSidebar();
+      }
+    }
+
+    function closeMobileSidebar() {
+      document.getElementById("sidebar").classList.add("-translate-x-full");
+      document.getElementById("sidebarOverlay").classList.add("hidden");
+    }
+
+    const searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener("input", (e) => {
+      searchQuery = e.target.value.trim();
+      document.getElementById("clearSearchBtn").classList.toggle("hidden", searchQuery === "");
+      renderSidebar();
+      renderContent();
     });
 
-    document.getElementById("clearBtn").addEventListener("click", resetFilters);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "/" && document.activeElement !== searchInput) {
+        e.preventDefault();
+        searchInput.focus();
+      }
+    });
 
-    initCategories();
-    renderRules();
+    renderSidebar();
+    renderContent();
   </script>
 </body>
 </html>
